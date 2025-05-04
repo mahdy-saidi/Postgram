@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 import os
+import base64
 import subprocess
-from constructs import Construct
 import json
+from constructs import Construct
 from cdktf import App, TerraformStack
 from cdktf_cdktf_provider_aws.provider import AwsProvider
 from cdktf_cdktf_provider_aws.default_vpc import DefaultVpc
@@ -10,21 +11,28 @@ from cdktf_cdktf_provider_aws.default_subnet import DefaultSubnet
 from cdktf_cdktf_provider_aws.launch_template import LaunchTemplate
 from cdktf_cdktf_provider_aws.lb import Lb
 from cdktf_cdktf_provider_aws.lb_target_group import LbTargetGroup
-from cdktf_cdktf_provider_aws.lb_listener import LbListener, LbListenerDefaultAction
+from cdktf_cdktf_provider_aws.lb_listener import (
+    LbListener,
+    LbListenerDefaultAction,
+)
 from cdktf_cdktf_provider_aws.autoscaling_group import AutoscalingGroup
 from cdktf_cdktf_provider_aws.security_group import (
     SecurityGroup,
     SecurityGroupIngress,
     SecurityGroupEgress,
 )
-from cdktf_cdktf_provider_aws.data_aws_caller_identity import DataAwsCallerIdentity
+from cdktf_cdktf_provider_aws.data_aws_caller_identity import (
+    DataAwsCallerIdentity,
+)
 
-import base64
 
 # Exécuter la commande pour obtenir les outputs
 os.chdir("cdktf.out/stacks/cdktf_serverless")
 result = subprocess.run(
-    ["terraform", "output", "-json"], capture_output=True, text=True
+    ["terraform", "output", "-json"],
+    capture_output=True,
+    text=True,
+    check=True,
 )
 outputs = json.loads(result.stdout)
 
@@ -35,7 +43,7 @@ bucket = outputs["s3_bucket_name"]["value"]
 dynamo_table = outputs["dynamodb_table_name"]["value"]
 
 # Mettez ici l'url de votre dépôt github. Votre dépôt doit être public !!!
-your_repo = "https://github.com/mahdy-saidi/Postgram.git"
+YOUR_REPO = "https://github.com/mahdy-saidi/Postgram.git"
 
 # Le user data pour lancer votre websservice. Il fonctionne tel quel
 user_data = base64.b64encode(
@@ -43,7 +51,7 @@ user_data = base64.b64encode(
 echo "userdata-start"        
 apt update
 apt install -y python3-pip python3.12-venv
-git clone {your_repo} projet
+git clone {YOUR_REPO} projet
 cd projet/webservice
 python3 -m venv venv
 source venv/bin/activate
@@ -78,10 +86,13 @@ class ServerStack(TerraformStack):
             tags={"Name": "TP noté"},
             iam_instance_profile={"name": "LabInstanceProfile"},
             metadata_options={
-                "http_endpoint": "enabled",  # Enable metadata endpoint
-                "http_tokens": "optional",  # Make token optional (supporting both V1 and V2)
+                # Enable metadata endpoint
+                "http_endpoint": "enabled",
+                # Make token optional (supporting both V1 and V2)
+                "http_tokens": "optional",
                 "http_put_response_hop_limit": 1,
-                "http_protocol_ipv6": "disabled",  # Disable IPv6 metadata endpoint as per your requirements
+                # Disable IPv6 metadata endpoint as per your requirements
+                "http_protocol_ipv6": "disabled",
             },
         )
 
@@ -157,7 +168,10 @@ class ServerStack(TerraformStack):
                     protocol="TCP",
                 ),
                 SecurityGroupIngress(
-                    from_port=80, to_port=80, cidr_blocks=["0.0.0.0/0"], protocol="TCP"
+                    from_port=80,
+                    to_port=80,
+                    cidr_blocks=["0.0.0.0/0"],
+                    protocol="TCP",
                 ),
                 SecurityGroupIngress(
                     from_port=8080,
@@ -168,7 +182,10 @@ class ServerStack(TerraformStack):
             ],
             egress=[
                 SecurityGroupEgress(
-                    from_port=0, to_port=0, cidr_blocks=["0.0.0.0/0"], protocol="-1"
+                    from_port=0,
+                    to_port=0,
+                    cidr_blocks=["0.0.0.0/0"],
+                    protocol="-1",
                 )
             ],
         )

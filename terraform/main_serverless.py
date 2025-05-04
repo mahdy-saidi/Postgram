@@ -8,8 +8,6 @@ from cdktf import (
     AssetType,
 )
 from cdktf_cdktf_provider_aws.provider import AwsProvider
-from cdktf_cdktf_provider_aws.default_vpc import DefaultVpc
-from cdktf_cdktf_provider_aws.default_subnet import DefaultSubnet
 from cdktf_cdktf_provider_aws.lambda_function import LambdaFunction
 from cdktf_cdktf_provider_aws.lambda_permission import LambdaPermission
 from cdktf_cdktf_provider_aws.data_aws_caller_identity import (

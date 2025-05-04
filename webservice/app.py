@@ -79,9 +79,9 @@ async def post_a_post(
             detail="Authorization header is missing",
         )
 
-    logger.info(f"title : {post.title}")
-    logger.info(f"body : {post.body}")
-    logger.info(f"user : {authorization}")
+    logger.info("title : %s", post.title)
+    logger.info("body : %s", post.body)
+    logger.info("user : %s", authorization)
 
     title = post.title
     body = post.body
@@ -99,12 +99,12 @@ async def post_a_post(
                 "body": body,
             }
         )
-        logger.info(f"DynamoDB response: {res}")
+        logger.info("DynamoDB response: %s", res)
     except Exception as e:
-        logger.error(f"Error saving post: {e}")
+        logger.error("Error saving post: %s", e)
         raise HTTPException(
             status_code=500, detail="Server error while saving the post"
-        )
+        ) from e
 
     # Doit retourner le résultat de la requête la table dynamodb
     return res
@@ -118,7 +118,7 @@ async def get_all_posts(user: Union[str, None] = None):
     - Si aucun user n'est présent, récupère TOUS les postes de la table !!
     """
     if user:
-        logger.info(f"Récupération des postes de : {user}")
+        logger.info("Récupération des postes de : %s", user)
         posts = table.query(
             KeyConditionExpression="PK = :pk",
             ExpressionAttributeValues={
@@ -165,8 +165,8 @@ async def delete_post(
     authorization: str | None = Header(default=None),
 ):
     # Doit retourner le résultat de la requête la table dynamodb
-    logger.info(f"post id : {post_id}")
-    logger.info(f"user: {authorization}")
+    logger.info("post id : %s", post_id)
+    logger.info("user: %s", authorization)
     # Récupération des infos du poste
     pk = "USER#" + authorization
     sk = "POST#" + post_id
@@ -181,7 +181,7 @@ async def delete_post(
     if post.get("image"):
         folder_name = f"{authorization}/{post_id}"
         try:
-            logger.info(f"Deleting S3 folder {folder_name}")
+            logger.info("Deleting S3 folder %s", folder_name)
             response = s3_client.list_objects_v2(
                 Bucket=bucket,
                 Prefix=folder_name,
@@ -193,7 +193,7 @@ async def delete_post(
                     Delete={"Objects": keys},
                 )
         except Exception as e:
-            logger.error(f"Error deleting {folder_name}: {e}")
+            logger.error("Error deleting %s: %s", folder_name, e)
 
     # Suppression de la ligne dans la base dynamodb
     try:
@@ -204,7 +204,7 @@ async def delete_post(
             }
         )
     except Exception as e:
-        logger.error(f"Error deleting post: {e}")
+        logger.error("Error deleting post: %s", e)
         raise e
 
     # Retourne le résultat de la requête de suppression

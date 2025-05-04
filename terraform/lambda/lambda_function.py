@@ -1,8 +1,8 @@
+import os
 import json
 from urllib.parse import unquote_plus
-import boto3
-import os
 import logging
+import boto3
 
 print("Loading function")
 logger = logging.getLogger()
@@ -34,28 +34,25 @@ def lambda_handler(event, context):
                 ]
             },
         )
-        logger.info(f"Tags added to {key}")
+        logger.info("Tags added to %s", key)
     except Exception as e:
-        logger.error(f"Failed to tag object: {e}")
+        logger.error("Failed to tag object: %s", e)
 
     # Appel à reckognition
-    label_data = reckognition.detect_labels()
     label_data = reckognition.detect_labels(
         Image={"S3Object": {"Bucket": bucket, "Name": key}},
         MaxLabels=5,
         MinConfidence=0.75,
     )
 
-    logger.info(f"Labels data : {label_data}")
+    logger.info("Labels data : %s", label_data)
 
     # Récupération des résultats des labels
     labels = [label["Name"] for label in label_data["Labels"]]
-    logger.info(f"Labels detected : {labels}")
+    logger.info("Labels detected : %s", labels)
     # Mise à jour de la table dynamodb
-    table.update_item()
-
     try:
-        logger.info(f"Saving image and labels for post ${post_id}")
+        logger.info("Saving image and labels for post %s", post_id)
         table.update_item(
             Key={
                 "PK": f"USER#{username}",
@@ -69,5 +66,5 @@ def lambda_handler(event, context):
         )
 
     except Exception as e:
-        logger.error(f"Unable to update post. Error {e}")
+        logger.error("Unable to update post. Error %s", e)
         raise e
