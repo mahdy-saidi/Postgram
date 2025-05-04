@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from constructs import Construct
+import subprocess, json
 from cdktf import App, TerraformStack
 from cdktf_cdktf_provider_aws.provider import AwsProvider
 from cdktf_cdktf_provider_aws.default_vpc import DefaultVpc
@@ -14,11 +15,18 @@ from cdktf_cdktf_provider_aws.data_aws_caller_identity import DataAwsCallerIdent
 
 import base64
 
+# Exécuter la commande pour obtenir les outputs
+result = subprocess.run(
+    ["terraform", "output", "-json"], capture_output=True, text=True
+)
+outputs = json.loads(result.stdout)
+
+
 # Mettez ici le nom du bucket S3 crée dans la partie serverless
-bucket=""
+bucket= outputs["s3_bucket_name"]["value"]
 
 # Mettez ici le nom de la table dynamoDB créée dans la partie serverless
-dynamo_table=""
+dynamo_table=outputs["dynamodb_table_name"]["value"]
 
 # Mettez ici l'url de votre dépôt github. Votre dépôt doit être public !!!
 your_repo=""
