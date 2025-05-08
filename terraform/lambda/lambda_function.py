@@ -22,6 +22,9 @@ def lambda_handler(event, context):
     # Récupération de l'utilisateur et de l'UUID de la tâche
     username, post_id = key.split("/")[:2]
 
+    pk = f"USER#{username}"
+    sk = f"POST#{post_id}"
+
     # Ajout des tags user et task_uuid
     try:
         s3.put_object_tagging(
@@ -29,8 +32,8 @@ def lambda_handler(event, context):
             Key=key,
             Tagging={
                 "TagSet": [
-                    {"Key": "PK", "Value": f"USER#{username}"},
-                    {"Key": "SK", "Value": f"POST#{post_id}"},
+                    {"Key": "PK", "Value": pk},
+                    {"Key": "SK", "Value": sk},
                 ]
             },
         )
@@ -55,8 +58,8 @@ def lambda_handler(event, context):
         logger.info("Saving image and labels for post %s", post_id)
         table.update_item(
             Key={
-                "PK": f"USER#{username}",
-                "SK": f"POST#{post_id}",
+                "PK": pk,
+                "SK": sk,
             },
             AttributeUpdates={
                 "image": {"Value": f"s3://{bucket}/{key}", "Action": "PUT"},

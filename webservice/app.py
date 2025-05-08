@@ -6,6 +6,7 @@
 import boto3
 from botocore.config import Config
 import os
+import mimetypes
 import uuid
 from dotenv import load_dotenv
 from typing import Union
@@ -133,15 +134,17 @@ async def get_all_posts(user: Union[str, None] = None):
 
     for item in posts.get("Items", []):
 
-        username = item.get("PK", "").replace("USER#", "")
-        post_id = item.get("SK", "").replace("POST#", "")
+        username = item.get("PK", "")
+        post_id = item.get("SK", "")
         title = item.get("title ", "")
         body = item.get("body", "")
 
         if item.get("image"):
             filename = item.get("image")
-            extension = filename.split(".")[-1]
-            image = getSignedUrl(filename, extension, post_id, username)
+            filetype, _ = mimetypes.guess_type(filename)
+            if not filetype:
+                filetype = "application/octet-stream"
+            image = getSignedUrl(filename, filetype, post_id, username)
         else:
             image = ""
         label = item.get("label", [])

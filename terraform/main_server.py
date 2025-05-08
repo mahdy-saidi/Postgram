@@ -1,8 +1,5 @@
 #!/usr/bin/env python
-import os
 import base64
-import subprocess
-import json
 from constructs import Construct
 from cdktf import App, TerraformStack
 from cdktf_cdktf_provider_aws.provider import AwsProvider
@@ -26,21 +23,11 @@ from cdktf_cdktf_provider_aws.data_aws_caller_identity import (
 )
 
 
-# Exécuter la commande pour obtenir les outputs
-os.chdir("cdktf.out/stacks/cdktf_serverless")
-result = subprocess.run(
-    ["terraform", "output", "-json"],
-    capture_output=True,
-    text=True,
-    check=True,
-)
-outputs = json.loads(result.stdout)
-
 # Mettez ici le nom du bucket S3 crée dans la partie serverless
-bucket = outputs["s3_bucket_name"]["value"]
+bucket = "postgram-bucket-20250504084641173200000001"
 
 # Mettez ici le nom de la table dynamoDB créée dans la partie serverless
-dynamo_table = outputs["dynamodb_table_name"]["value"]
+dynamo_table = "postgram"
 
 # Mettez ici l'url de votre dépôt github. Votre dépôt doit être public !!!
 YOUR_REPO = "https://github.com/mahdy-saidi/Postgram.git"
