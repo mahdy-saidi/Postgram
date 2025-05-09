@@ -35,7 +35,7 @@ YOUR_REPO = "https://github.com/mahdy-saidi/Postgram.git"
 # Le user data pour lancer votre websservice. Il fonctionne tel quel
 user_data = base64.b64encode(
     f"""#!/bin/bash
-echo "userdata-start"        
+echo "userdata-start"
 apt update
 apt install -y python3-pip python3.12-venv
 git clone {YOUR_REPO} projet
@@ -47,7 +47,8 @@ echo 'BUCKET={bucket}' >> .env
 echo 'DYNAMO_TABLE={dynamo_table}' >> .env
 pip3 install -r requirements.txt
 venv/bin/python app.py
-echo "userdata-end""".encode(
+echo "userdata-end"
+""".encode(
         "ascii"
     )
 ).decode("ascii")
