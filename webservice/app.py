@@ -8,7 +8,6 @@ from botocore.config import Config
 import os
 import mimetypes
 import uuid
-from dotenv import load_dotenv
 from typing import Union
 import logging
 from fastapi import FastAPI, Request, status, Header, HTTPException
@@ -20,7 +19,6 @@ import uvicorn
 
 from getSignedUrl import getSignedUrl
 
-load_dotenv()
 
 app = FastAPI()
 logger = logging.getLogger("uvicorn")

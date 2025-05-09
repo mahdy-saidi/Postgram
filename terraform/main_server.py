@@ -70,16 +70,14 @@ class ServerStack(TerraformStack):
             vpc_security_group_ids=[security_group.id],
             key_name="vockey",
             user_data=user_data,
+            name="postgram_template",
             tags={"Name": "TP noté"},
             iam_instance_profile={"name": "LabInstanceProfile"},
             metadata_options={
-                # Enable metadata endpoint
-                "http_endpoint": "enabled",
-                # Make token optional (supporting both V1 and V2)
-                "http_tokens": "optional",
+                "http_endpoint": "enabled",  # Enable metadata endpoint
+                "http_tokens": "optional",  # Make token optional (supporting both V1 and V2)
                 "http_put_response_hop_limit": 1,
-                # Disable IPv6 metadata endpoint as per your requirements
-                "http_protocol_ipv6": "disabled",
+                "http_protocol_ipv6": "disabled",  # Disable IPv6 metadata endpoint as per your requirements
             },
         )
 
