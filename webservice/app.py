@@ -134,20 +134,20 @@ async def get_all_posts(user: Union[str, None] = None):
 
     for item in posts.get("Items", []):
 
-        username = item.get("PK", "")
-        post_id = item.get("SK", "")
+        username = item.get("PK", "").replace("USER#", "")
+        post_id = item.get("SK", "").replace("POST#", "")
         title = item.get("title ", "")
         body = item.get("body", "")
 
         if item.get("image"):
-            filename = item.get("image")
+            folder, subfolder, filename = item.get("image").split('/')[-3:]
             filetype, _ = mimetypes.guess_type(filename)
             if not filetype:
                 filetype = "application/octet-stream"
-            image = getSignedUrl(filename, filetype, post_id, username)
+            image = getSignedUrl(filename, filetype, subfolder, folder)
         else:
             image = ""
-        label = item.get("labels", [])
+        labels = item.get("labels", [])
 
         formatted_item = {
             "user": username,
@@ -155,7 +155,7 @@ async def get_all_posts(user: Union[str, None] = None):
             "title": title,
             "body": body,
             "image": image,
-            "labels": label,
+            "label": labels,
         }
         res.append(formatted_item)
 
@@ -182,7 +182,7 @@ async def delete_post(
     )
     # S'il y a une image on la supprime de S3
     if post.get("image"):
-        folder_name = f"{authorization}/{post_id}"
+        folder_name = f"{authorization}/{post_id}/"
         try:
             logger.info("Deleting S3 folder %s", folder_name)
             response = s3_client.list_objects_v2(
