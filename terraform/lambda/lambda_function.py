@@ -3,9 +3,7 @@ import json
 from urllib.parse import unquote_plus
 import logging
 import boto3
-from dotenv import load_dotenv
 
-load_dotenv()
 
 print("Loading function")
 logger = logging.getLogger()
