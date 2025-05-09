@@ -153,7 +153,7 @@ async def get_all_posts(user: Union[str, None] = None):
                 ClientMethod="get_object",
             )
         else:
-            image = None
+            image = ""
         labels = item.get("labels", None)
 
         formatted_item = {
