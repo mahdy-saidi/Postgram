@@ -134,8 +134,8 @@ async def get_all_posts(user: Union[str, None] = None):
 
     for item in posts.get("Items", []):
 
-        username = item.get("PK", "").replace("USER#", "")
-        post_id = item.get("SK", "").replace("POST#", "")
+        username = item.get("PK", "")
+        post_id = item.get("SK", "")
         title = item.get("title ", "")
         body = item.get("body", "")
 
@@ -155,7 +155,7 @@ async def get_all_posts(user: Union[str, None] = None):
             "title": title,
             "body": body,
             "image": image,
-            "label": labels,
+            "labels": labels,
         }
         res.append(formatted_item)
 
