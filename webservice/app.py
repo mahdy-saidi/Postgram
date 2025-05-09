@@ -147,7 +147,7 @@ async def get_all_posts(user: Union[str, None] = None):
             image = getSignedUrl(filename, filetype, post_id, username)
         else:
             image = ""
-        label = item.get("label", [])
+        label = item.get("labels", [])
 
         formatted_item = {
             "user": username,
@@ -155,7 +155,7 @@ async def get_all_posts(user: Union[str, None] = None):
             "title": title,
             "body": body,
             "image": image,
-            "label": label,
+            "labels": label,
         }
         res.append(formatted_item)
 

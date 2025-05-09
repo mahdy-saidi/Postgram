@@ -74,12 +74,6 @@ class ServerStack(TerraformStack):
             name="postgram_template",
             tags={"Name": "TP noté"},
             iam_instance_profile={"name": "LabInstanceProfile"},
-            metadata_options={
-                "http_endpoint": "enabled",  # Enable metadata endpoint
-                "http_tokens": "optional",  # Make token optional (supporting both V1 and V2)
-                "http_put_response_hop_limit": 1,
-                "http_protocol_ipv6": "disabled",  # Disable IPv6 metadata endpoint as per your requirements
-            },
         )
 
         lb = Lb(

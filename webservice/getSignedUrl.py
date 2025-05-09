@@ -13,8 +13,8 @@ import json
 import uuid
 from pathlib import Path
 from botocore.exceptions import ClientError
-
 from dotenv import load_dotenv
+
 load_dotenv()
 
 bucket = os.getenv("BUCKET")

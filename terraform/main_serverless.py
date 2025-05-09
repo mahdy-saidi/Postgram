@@ -89,6 +89,11 @@ class ServerlessStack(TerraformStack):
             role=f"arn:aws:iam::{account_id}:role/LabRole",
             filename=code.path,
             handler="lambda_function.lambda_handler",
+            environment={
+                "variables": {
+                    "table": dynamo_table.name,
+                }
+            },
         )
 
         # NE PAS TOUCHER !!!!
