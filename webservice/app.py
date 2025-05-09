@@ -140,14 +140,21 @@ async def get_all_posts(user: Union[str, None] = None):
         body = item.get("body", "")
 
         if item.get("image"):
-            folder, subfolder, filename = item.get("image").split('/')[-3:]
+            folder, subfolder, filename = item.get("image").split("/")[-3:]
+            object_name = f"{folder}/{subfolder}/{filename}"
             filetype, _ = mimetypes.guess_type(filename)
             if not filetype:
                 filetype = "application/octet-stream"
-            image = getSignedUrl(filename, filetype, subfolder, folder)
+            image = s3_client.generate_presigned_url(
+                Params={
+                    "Bucket": bucket,
+                    "Key": object_name,
+                },
+                ClientMethod="get_object",
+            )
         else:
-            image = ""
-        labels = item.get("labels", [])
+            image = None
+        labels = item.get("labels", None)
 
         formatted_item = {
             "user": username,
@@ -173,30 +180,21 @@ async def delete_post(
     # Récupération des infos du poste
     pk = "USER#" + authorization
     sk = "POST#" + post_id
-    post = table.query(
-        KeyConditionExpression="PK = :pk AND SK = :sk",
-        ExpressionAttributeValues={
-            ":pk": pk,
-            ":sk": sk,
-        },
-    )
+
     # S'il y a une image on la supprime de S3
-    if post.get("image"):
-        folder_name = f"{authorization}/{post_id}/"
+    folder_name = f"{authorization}/{post_id}"
+    response = s3_client.list_objects_v2(Bucket=bucket, Prefix=folder_name)
+    if "Contents" in response:
         try:
-            logger.info("Deleting S3 folder %s", folder_name)
-            response = s3_client.list_objects_v2(
-                Bucket=bucket,
-                Prefix=folder_name,
+            objects_to_delete = [{"Key": obj["Key"]} for obj in response["Contents"]]
+            delete_response = s3_client.delete_objects(
+                Bucket=bucket, Delete={"Objects": objects_to_delete}
             )
-            keys = [{"Key": k["Key"]} for k in response.get("Contents", [])]
-            if keys:
-                s3_client.delete_objects(
-                    Bucket=bucket,
-                    Delete={"Objects": keys},
-                )
+            logger.info("Deleted objects: %s", delete_response)
         except Exception as e:
             logger.error("Error deleting %s: %s", folder_name, e)
+    else:
+        logger.info("No objects found.")
 
     # Suppression de la ligne dans la base dynamodb
     try:
